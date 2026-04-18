@@ -1,34 +1,50 @@
-const productos = [
-  { img: "../imagenes/barco.webp", nombre: "Void Behemoth Battleship", descripcion: "Modelo de nave espacial impreso en 3D con gran nivel de detalle.", precio: 1500 },
-  { img: "../imagenes/moto.webp", nombre: "MOTO GP - DUCATI", descripcion: "Réplica 3D de moto de carreras, ideal para fanáticos del motociclismo.", precio: 1500 },
-  { img: "../imagenes/robot.webp", nombre: "YJ-20 Transforming Mech", descripcion: "Robot articulado inspirado en el universo sci-fi.", precio: 1500 },
-];
-
-function crearCards() {
+async function crearCards() {
   const cont = document.getElementById("cards-container");
   if (!cont) return;
 
-  let html = "";
-  productos.forEach(p => {
-    html += `<div class='card'>
-      <img src='${p.img}' alt='${p.nombre}'>
-      <div class="card-content">
-        <h3>${p.nombre}</h3>
-        <p>${p.descripcion}</p>
-        <p class='precio'>$${p.precio} ARS</p>
-        <button class='btn'>Comprar</button>
-      </div>
-    </div>`;
-  });
+  try {
+    const res = await fetch("/api/productos");
+    const productos = await res.json();
+    const destacados = productos.filter(p => p.destacado).slice(0, 3);
 
-  const linkCardHTML = `
-    <a href="/pages/productos.html" class="card card-link">
-      <h3>Ver todos los productos</h3>
-      <p>Haz clic aquí para ver nuestro catálogo completo.</p>
-      <span class="flecha">&rarr;</span>
-    </a>`;
+    let html = "";
+    destacados.forEach(p => {
+      html += `<div class='card'>
+        <img src='${p.imagen.replace("../", "/")}' alt='${p.nombre}'>
+        <div class="card-content">
+          <h3>${p.nombre}</h3>
+          <p>${p.desc}</p>
+          <p class='precio'>$${p.precio}</p>
+          <button class='btn' onclick='agregarAlCarrito(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Agregar al carrito</button>
+        </div>
+      </div>`;
+    });
 
-  cont.innerHTML = html + linkCardHTML;
+    const linkCardHTML = `
+      <a href="/pages/productos.html" class="card card-link">
+        <h3>Ver todos los productos</h3>
+        <p>Hacé clic acá para ver el catálogo completo.</p>
+        <span class="flecha">&rarr;</span>
+      </a>`;
+
+    cont.innerHTML = html + linkCardHTML;
+  } catch (error) {
+    console.error("Error cargando productos:", error);
+    cont.innerHTML = "<p>Error al cargar los productos.</p>";
+  }
+}
+
+function agregarAlCarrito(producto) {
+  const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
+  const existente = carrito.find(item => item.id === producto.id);
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    carrito.push({ ...producto, cantidad: 1 });
+  }
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  alert(`"${producto.nombre}" agregado al carrito`);
+  crearNavbar();
 }
 
 crearCards();
