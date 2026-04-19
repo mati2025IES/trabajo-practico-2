@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { leerJSON, escribirJSON } from '../utils/dataHandler.js';
+
 const router = express.Router();
-const { leerJSON, escribirJSON } = require('../utils/dataHandler');
 
 router.get('/', (req, res) => {
   const usuarios = leerJSON('usuarios.json');
@@ -90,4 +91,4 @@ router.delete('/:id', (req, res) => {
   res.json({ mensaje: 'Usuario eliminado correctamente' });
 });
 
-module.exports = router;
+export default router;

@@ -1,14 +1,18 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import usuariosRouter from './routes/usuarios.js';
+import productosRouter from './routes/productos.js';
+import ventasRouter from './routes/ventas.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
-
-const usuariosRouter = require('./routes/usuarios');
-const productosRouter = require('./routes/productos');
-const ventasRouter = require('./routes/ventas');
 
 app.use('/api/usuarios', usuariosRouter);
 app.use('/api/productos', productosRouter);

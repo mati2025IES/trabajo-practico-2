@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { leerJSON, escribirJSON } from '../utils/dataHandler.js';
+
 const router = express.Router();
-const { leerJSON, escribirJSON } = require('../utils/dataHandler');
 
 router.get('/', (req, res) => {
   const productos = leerJSON('productos.json');
@@ -65,4 +66,4 @@ router.put('/:id', (req, res) => {
   res.json(productos[index]);
 });
 
-module.exports = router;
+export default router;
